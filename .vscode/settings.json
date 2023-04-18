@@ -1,4 +1,5 @@
 {
+    "rust-analyzer.assist.importMergeBehaviour": "last",
     "rust-analyzer.linkedProjects": [
         "./Cargo.toml",
         "./Cargo.toml"
