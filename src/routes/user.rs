@@ -1,6 +1,7 @@
 use axum::{extract, http::StatusCode, response::IntoResponse, Extension, Json};
 use axum::{routing::get, Router};
 use jsonwebtoken::{encode, get_current_timestamp, Header};
+use serde::Deserialize;
 use serde_json::{json, Value};
 use sqlx::MySqlPool;
 
@@ -9,6 +10,8 @@ use crate::model::auth::{Claims, Keys};
 use crate::repository::user::UserRepository;
 use model::auth::AuthLogin;
 
+use jsonwebtoken::{decode, Validation};
+
 pub fn user_routes(pool: MySqlPool) -> Router {
     let user_repository = UserRepository {
         db_connection: pool,
@@ -16,6 +19,7 @@ pub fn user_routes(pool: MySqlPool) -> Router {
 
     Router::new()
         .route("/login", get(login))
+        .route("/me", get(user_profile))
         .layer(Extension(user_repository))
 }
 
@@ -32,7 +36,7 @@ pub async fn login(
 
         let claims = Claims {
             email: payload.email,
-            expire_at: get_current_timestamp(),
+            exp: get_current_timestamp(),
         };
 
         let jwt_secret = std::env::var("JWT_SECRET").expect("JWT SECRET ENV NOT SET");
@@ -44,4 +48,19 @@ pub async fn login(
     } else {
         Json(json!({ "error": "Bearer" }))
     }
+}
+
+#[derive(Deserialize, Debug)]
+pub struct PayloadTest {
+    token: String,
+}
+
+pub async fn user_profile(Json(payload): Json<PayloadTest>) -> Json<Value> {
+    let jwt_secret = std::env::var("JWT_SECRET").expect("JWT SECRET ENV NOT SET");
+    let secret = Keys::new(jwt_secret.as_bytes());
+
+    let data =
+        decode::<Claims>(&payload.token, &secret.decoding, &Validation::default()).expect("ERROR");
+
+    Json(json!({ "data": data.claims }))
 }
