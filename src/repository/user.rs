@@ -1,24 +1,16 @@
-// use async_trait::async_trait;
-// use sqlx::MySqlPool;
+use sqlx::MySqlPool;
 
-// use crate::model::user::User;
+use crate::model::user::User;
 
-// #[derive(Clone)]
-// pub struct TodoRepository {
-//     pub db_connection: MySqlPool,
-// }
+#[derive(Clone)]
+pub struct UserRepository {
+    pub db_connection: MySqlPool,
+}
 
-// #[async_trait]
-// pub trait Repository<T> {
-//     async fn find(&self, id: u64) -> T;
-// }
-
-// #[async_trait]
-// impl Repository<User> for TodoRepository {
-//     async fn find(&self, id: u64) -> User {
-//         sqlx::query_as!(User, "SELECT * FROM users WHERE id = ?", id)
-//             .fetch_one(&self.db_connection)
-//             .await
-//             .unwrap()
-//     }
-// }
+impl UserRepository {
+    pub async fn find_user_by_email(&self, email: &String) -> Result<User, sqlx::Error> {
+        sqlx::query_as!(User, "SELECT * FROM users WHERE email = ?", email)
+            .fetch_one(&self.db_connection)
+            .await
+    }
+}

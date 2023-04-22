@@ -9,8 +9,8 @@ pub struct AuthLogin {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    pub password: String,
-    pub exp: u64,
+    pub email: String,
+    pub expire_at: u64,
 }
 
 pub struct Keys {
