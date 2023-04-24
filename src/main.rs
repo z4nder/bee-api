@@ -1,6 +1,7 @@
 use dotenv::dotenv;
 use std::net::SocketAddr;
 
+mod controller;
 mod database;
 mod model;
 mod repository;
