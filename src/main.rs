@@ -1,12 +1,15 @@
 use dotenv::dotenv;
 use std::net::SocketAddr;
 
-mod controller;
 mod database;
+mod dto;
 mod errors;
+mod extractors;
+mod handlers;
 mod model;
 mod repository;
 mod routes;
+mod utils;
 
 use database::mysql::db_connect;
 use routes::user::user_routes;

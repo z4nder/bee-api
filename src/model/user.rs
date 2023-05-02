@@ -11,3 +11,17 @@ pub struct User {
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
 }
+
+impl User {
+    pub fn test() -> User {
+        User {
+            id: 1,
+            name: String::from("John Doe"),
+            email: String::from("john.doe@example.com"),
+            password: String::from("password123"),
+            email_verified_at: None,
+            created_at: Some(Utc::now()),
+            updated_at: Some(Utc::now()),
+        }
+    }
+}
