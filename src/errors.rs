@@ -6,38 +6,19 @@ use reqwest::StatusCode;
 use serde_json::json;
 
 #[derive(Debug)]
-pub enum RepositoryError {
-    #[allow(dead_code)]
-    NotFound,
-    #[allow(dead_code)]
-    InvalidData,
-}
-
 pub enum AppError {
-    UserRepository(RepositoryError),
-}
-
-impl From<RepositoryError> for AppError {
-    fn from(inner: RepositoryError) -> Self {
-        AppError::UserRepository(inner)
-    }
+    NotFound,
+    InvalidData,
+    InvalidToken,
 }
 
 impl IntoResponse for AppError {
-    fn into_response(self) -> Response {
-        let (status, error_message) = match self {
-            AppError::UserRepository(RepositoryError::NotFound) => {
-                (StatusCode::NOT_FOUND, "User not found")
-            }
-            AppError::UserRepository(RepositoryError::InvalidData) => {
-                (StatusCode::UNPROCESSABLE_ENTITY, "Invalid data")
-            }
+    fn into_response(self) -> axum::response::Response {
+        let (status, err_msg) = match self {
+            Self::InvalidToken => (StatusCode::BAD_REQUEST, "invalid token"),
+            Self::NotFound => (StatusCode::BAD_REQUEST, "missing credential"),
+            Self::InvalidData => (StatusCode::INTERNAL_SERVER_ERROR, "failed to create token"),
         };
-
-        let body = Json(json!({
-            "error": error_message,
-        }));
-
-        (status, body).into_response()
+        (status, Json(json!({ "error": err_msg }))).into_response()
     }
 }
