@@ -6,6 +6,7 @@ use axum::{
     response::{IntoResponse, Response},
     RequestPartsExt,
 };
+use sqlx::MySqlPool;
 
 use crate::{
     errors::AppError,
@@ -27,13 +28,20 @@ where
                 .await
                 .map_err(|err| err.into_response())?;
 
-        let Extension(user_repository) = parts
-            .extract::<Extension<UserRepository>>()
+        let Extension(pool) = parts
+            .extract::<Extension<MySqlPool>>()
             .await
             .map_err(|err| err.into_response())?;
 
+        let user_repository = UserRepository {
+            db_connection: &pool,
+        };
+
         let claims = jwt::verify(bearer.token());
 
-        Ok(user_repository.find_user_by_id(&claims.sub).await.unwrap())
+        Ok(user_repository
+            .find_user_by_id(&claims.sub)
+            .await
+            .map_err(|err| err.into_response())?)
     }
 }

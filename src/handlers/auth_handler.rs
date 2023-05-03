@@ -1,5 +1,6 @@
 use axum::{Extension, Json};
 use axum_macros::debug_handler;
+use sqlx::MySqlPool;
 
 use crate::{
     dto::auth_dto::{LoginInput, RegisterInput, TokenPayload},
@@ -20,9 +21,13 @@ pub async fn authorize(user: User) -> Json<UserProfile> {
 
 #[debug_handler]
 pub async fn login(
-    Extension(user_repository): Extension<UserRepository>,
+    Extension(pool): Extension<MySqlPool>,
     Json(payload): Json<LoginInput>,
 ) -> Result<Json<TokenPayload>, AppError> {
+    let user_repository = UserRepository {
+        db_connection: &pool,
+    };
+
     let user = AuthService::login(payload, user_repository)
         .await
         .map_err(|_| AppError::WrongCredentials)?;
@@ -36,9 +41,13 @@ pub async fn login(
 }
 
 pub async fn register(
-    Extension(user_repository): Extension<UserRepository>,
+    Extension(pool): Extension<MySqlPool>,
     Json(payload): Json<RegisterInput>,
 ) -> Result<Json<TokenPayload>, AppError> {
+    let user_repository = UserRepository {
+        db_connection: &pool,
+    };
+
     let id = AuthService::register(payload, user_repository).await?;
 
     let token = jwt::sign(id)?;

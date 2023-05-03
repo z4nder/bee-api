@@ -10,10 +10,10 @@ use crate::{
 
 pub struct AuthService;
 
-impl AuthService {
+impl<'a> AuthService {
     pub async fn login(
         input: LoginInput,
-        user_repository: UserRepository,
+        user_repository: UserRepository<'a>,
     ) -> Result<User, AppError> {
         let user = user_repository.find_user_by_email(&input.email).await?;
 
@@ -26,7 +26,7 @@ impl AuthService {
 
     pub async fn register(
         input: RegisterInput,
-        user_repository: UserRepository,
+        user_repository: UserRepository<'a>,
     ) -> Result<u64, AppError> {
         if user_repository
             .find_user_by_email(&input.email)

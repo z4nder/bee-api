@@ -1,5 +1,8 @@
+use axum::{Extension, Router};
 use dotenv::dotenv;
 use std::net::SocketAddr;
+use tower::ServiceBuilder;
+use tower_http::{cors::CorsLayer, trace::TraceLayer};
 
 mod database;
 mod dto;
@@ -13,7 +16,7 @@ mod services;
 mod utils;
 
 use database::mysql::db_connect;
-use routes::user::user_routes;
+use routes::auth::auth_routes;
 
 #[tokio::main]
 async fn main() {
@@ -21,10 +24,20 @@ async fn main() {
 
     let pool = db_connect().await.unwrap();
 
+    let layers = ServiceBuilder::new()
+        .layer(TraceLayer::new_for_http())
+        .layer(CorsLayer::permissive())
+        .layer(Extension(pool))
+        .into_inner();
+
+    let routes = Router::new().merge(auth_routes()).layer(layers);
+
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+
     println!("listening on {}", addr);
+
     axum::Server::bind(&addr)
-        .serve(user_routes(pool).into_make_service())
+        .serve(routes.into_make_service())
         .await
         .unwrap();
 }
