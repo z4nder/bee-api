@@ -1,6 +1,6 @@
 use sqlx::MySqlPool;
 
-use crate::{errors::AppError, model::user::User};
+use crate::{dto::auth_dto::CreateUserData, errors::AppError, model::user::User};
 
 #[derive(Clone)]
 pub struct UserRepository {
@@ -8,6 +8,16 @@ pub struct UserRepository {
 }
 
 impl UserRepository {
+    pub async fn create(&self, payload: CreateUserData) -> Result<u64, AppError> {
+        let insert_id = sqlx::query_as!(User, "INSERT INTO users (name) VALUES (?)", payload.name)
+            .execute(&self.db_connection)
+            .await
+            .map_err(|err| AppError::NotFound)?
+            .last_insert_id();
+
+        Ok(insert_id)
+    }
+
     pub async fn find_user_by_email(&self, email: &String) -> Result<User, AppError> {
         let query = sqlx::query_as!(User, "SELECT * FROM users WHERE email = ?", email)
             .fetch_one(&self.db_connection)

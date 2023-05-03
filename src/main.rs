@@ -9,6 +9,7 @@ mod handlers;
 mod model;
 mod repository;
 mod routes;
+mod services;
 mod utils;
 
 use database::mysql::db_connect;

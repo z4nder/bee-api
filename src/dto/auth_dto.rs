@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
 
@@ -30,4 +31,13 @@ pub struct AuthPayload {
 pub struct TokenPayload {
     pub access_token: String,
     pub token_type: String,
+}
+
+#[derive(Debug)]
+pub struct CreateUserData {
+    pub name: String,
+    pub email: String,
+    pub password: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
 }
