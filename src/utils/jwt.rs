@@ -31,7 +31,7 @@ pub fn sign(id: u64) -> Result<std::string::String, AppError> {
         &Claims::new(id),
         &EncodingKey::from_secret(jwt_secret.as_bytes()),
     )
-    .map_err(|_| AppError::UnexpectedError)
+    .map_err(|_| AppError::TokenError)
 }
 
 pub fn verify(token: &str) -> Claims {

@@ -1,4 +1,4 @@
-use bcrypt::{BcryptError, DEFAULT_COST};
+use bcrypt::DEFAULT_COST;
 
 use crate::errors::AppError;
 
@@ -9,7 +9,7 @@ pub async fn hash_password(password: String) -> Result<String, AppError> {
         let _ = send.send(result);
     });
 
-    recv.await.map_err(|err| AppError::NotFound)?
+    recv.await.map_err(|_| AppError::EncryptError)?
 }
 
 pub async fn verify_password(password: String, hash: String) -> Result<bool, AppError> {
@@ -19,5 +19,5 @@ pub async fn verify_password(password: String, hash: String) -> Result<bool, App
         let _ = send.send(result);
     });
 
-    recv.await.map_err(|err| AppError::NotFound)?
+    recv.await.map_err(|_| AppError::EncryptError)?
 }

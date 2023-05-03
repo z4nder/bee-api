@@ -6,22 +6,20 @@ use serde_json::json;
 pub enum AppError {
     UnexpectedError,
     NotFound,
-    InvalidData,
-    InvalidToken,
     WrongCredentials,
     DuplicateUserEmail,
-    BcryptError,
+    EncryptError,
+    TokenError,
 }
 
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         let (status, err_msg) = match self {
-            Self::BcryptError => (StatusCode::INTERNAL_SERVER_ERROR, "unexpected error"),
+            Self::TokenError => (StatusCode::INTERNAL_SERVER_ERROR, "token error"),
             Self::UnexpectedError => (StatusCode::INTERNAL_SERVER_ERROR, "unexpected error"),
             Self::WrongCredentials => (StatusCode::BAD_REQUEST, "wrong credentials"),
-            Self::InvalidToken => (StatusCode::BAD_REQUEST, "invalid token"),
+            Self::EncryptError => (StatusCode::INTERNAL_SERVER_ERROR, "encrypt error"),
             Self::NotFound => (StatusCode::BAD_REQUEST, "missing credential"),
-            Self::InvalidData => (StatusCode::INTERNAL_SERVER_ERROR, "failed to create user"),
             Self::DuplicateUserEmail => (StatusCode::BAD_REQUEST, "email has been exists"),
         };
         (status, Json(json!({ "error": err_msg }))).into_response()
