@@ -5,7 +5,7 @@ use sqlx::MySqlPool;
 use tower::ServiceBuilder;
 use tower_http::{cors::CorsLayer, trace::TraceLayer};
 
-use crate::handlers::auth_handler::{authorize, login};
+use crate::handlers::auth_handler::{authorize, login, register};
 use crate::repository::user_repository::UserRepository;
 
 pub fn user_routes(pool: MySqlPool) -> Router {
@@ -21,6 +21,7 @@ pub fn user_routes(pool: MySqlPool) -> Router {
 
     Router::new()
         .route("/login", post(login))
+        .route("/register", post(register))
         .route("/authorize", get(authorize))
         .layer(middleware_stack)
 }

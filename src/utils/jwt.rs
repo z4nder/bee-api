@@ -2,7 +2,7 @@ use chrono::{Duration, Utc};
 use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 
-use crate::model::user::User;
+use crate::errors::AppError;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Claims {
@@ -24,13 +24,14 @@ impl Claims {
     }
 }
 
-pub fn sign(id: u64) -> Result<std::string::String, jsonwebtoken::errors::Error> {
+pub fn sign(id: u64) -> Result<std::string::String, AppError> {
     let jwt_secret = std::env::var("JWT_SECRET").expect("JWT SECRET ENV NOT SET");
     jsonwebtoken::encode(
         &Header::default(),
         &Claims::new(id),
         &EncodingKey::from_secret(jwt_secret.as_bytes()),
     )
+    .map_err(|_| AppError::UnexpectedError)
 }
 
 pub fn verify(token: &str) -> Claims {

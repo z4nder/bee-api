@@ -1,19 +1,21 @@
-use std::sync::Arc;
-
 use axum::{Extension, Json};
 use axum_macros::debug_handler;
-use serde_json::{json, Value};
 
 use crate::{
-    dto::auth_dto::{LoginInput, TokenPayload},
+    dto::auth_dto::{LoginInput, RegisterInput, TokenPayload},
     errors::AppError,
-    model::user::User,
+    model::user::{User, UserProfile},
     repository::user_repository::UserRepository,
+    services::auth_service::AuthService,
     utils::jwt,
 };
 
-pub async fn authorize(user: User) -> Json<User> {
-    Json(user)
+pub async fn authorize(user: User) -> Json<UserProfile> {
+    Json(UserProfile {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+    })
 }
 
 #[debug_handler]
@@ -21,13 +23,25 @@ pub async fn login(
     Extension(user_repository): Extension<UserRepository>,
     Json(payload): Json<LoginInput>,
 ) -> Result<Json<TokenPayload>, AppError> {
-    let user = user_repository.find_user_by_email(&payload.email).await?;
+    let user = AuthService::login(payload, user_repository)
+        .await
+        .map_err(|_| AppError::WrongCredentials)?;
 
-    if user.password != payload.password {
-        panic!("Invalid password");
-    }
+    let token = jwt::sign(user.id)?;
 
-    let token = jwt::sign(user.id).expect("Error mdfk");
+    Ok(Json(TokenPayload {
+        access_token: token,
+        token_type: "Bearer".to_string(),
+    }))
+}
+
+pub async fn register(
+    Extension(user_repository): Extension<UserRepository>,
+    Json(payload): Json<RegisterInput>,
+) -> Result<Json<TokenPayload>, AppError> {
+    let id = AuthService::register(payload, user_repository).await?;
+
+    let token = jwt::sign(id)?;
 
     Ok(Json(TokenPayload {
         access_token: token,

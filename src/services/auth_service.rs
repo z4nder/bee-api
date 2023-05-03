@@ -11,7 +11,7 @@ use crate::{
 pub struct AuthService;
 
 impl AuthService {
-    pub async fn sign_in(
+    pub async fn login(
         input: LoginInput,
         user_repository: UserRepository,
     ) -> Result<User, AppError> {
@@ -20,11 +20,11 @@ impl AuthService {
         if encryption::verify_password(input.password, user.password.to_owned()).await? {
             Ok(user)
         } else {
-            Err(AppError::WrongPassword)
+            Err(AppError::WrongCredentials)
         }
     }
 
-    pub async fn sign_up(
+    pub async fn register(
         input: RegisterInput,
         user_repository: UserRepository,
     ) -> Result<u64, AppError> {

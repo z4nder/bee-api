@@ -9,11 +9,17 @@ pub struct UserRepository {
 
 impl UserRepository {
     pub async fn create(&self, payload: CreateUserData) -> Result<u64, AppError> {
-        let insert_id = sqlx::query_as!(User, "INSERT INTO users (name) VALUES (?)", payload.name)
-            .execute(&self.db_connection)
-            .await
-            .map_err(|err| AppError::NotFound)?
-            .last_insert_id();
+        let insert_id = sqlx::query_as!(
+            User,
+            r#"INSERT INTO users (name, email, password) VALUES (?, ?, ?)"#,
+            payload.name,
+            payload.email,
+            payload.password
+        )
+        .execute(&self.db_connection)
+        .await
+        .map_err(|err| AppError::NotFound)?
+        .last_insert_id();
 
         Ok(insert_id)
     }
