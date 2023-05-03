@@ -12,6 +12,7 @@ pub struct User {
     pub updated_at: Option<DateTime<Utc>>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UserProfile {
     pub id: u64,
     pub name: String,

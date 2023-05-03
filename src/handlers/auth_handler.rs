@@ -10,6 +10,7 @@ use crate::{
     utils::jwt,
 };
 
+#[debug_handler]
 pub async fn authorize(user: User) -> Json<UserProfile> {
     Json(UserProfile {
         id: user.id,
