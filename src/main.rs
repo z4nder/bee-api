@@ -18,6 +18,8 @@ mod utils;
 use database::mysql::db_connect;
 use routes::auth::auth_routes;
 
+use crate::routes::tag::tag_routes;
+
 #[tokio::main]
 async fn main() {
     dotenv().ok();
@@ -31,7 +33,10 @@ async fn main() {
         .layer(Extension(pool.clone()))
         .into_inner();
 
-    let routes = Router::new().merge(auth_routes(&pool)).layer(layers);
+    let routes = Router::new()
+        .merge(auth_routes(&pool))
+        .merge(tag_routes(&pool))
+        .layer(layers);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
 
