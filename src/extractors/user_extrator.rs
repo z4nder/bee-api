@@ -1,19 +1,14 @@
 use axum::{
     async_trait,
-    extract::{Extension, FromRequest, FromRequestParts, State, TypedHeader},
+    extract::{Extension, FromRequestParts, TypedHeader},
     headers::{authorization::Bearer, Authorization},
-    http::{request::Parts, StatusCode},
+    http::request::Parts,
     response::{IntoResponse, Response},
     RequestPartsExt,
 };
 use sqlx::MySqlPool;
 
-use crate::{
-    errors::AppError,
-    model::user::User,
-    repository::user_repository::{self, UserRepository},
-    utils::jwt,
-};
+use crate::{model::user::User, repository::user_repository::UserRepository, utils::jwt};
 
 #[async_trait]
 impl<S> FromRequestParts<S> for User
@@ -34,7 +29,7 @@ where
             .map_err(|err| err.into_response())?;
 
         let user_repository = UserRepository {
-            db_connection: &pool,
+            db_connection: pool,
         };
 
         let claims = jwt::verify(bearer.token());

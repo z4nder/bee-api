@@ -23,14 +23,15 @@ async fn main() {
     dotenv().ok();
 
     let pool = db_connect().await.unwrap();
+    // let pool_layer = db_connect().await.unwrap();
 
     let layers = ServiceBuilder::new()
         .layer(TraceLayer::new_for_http())
         .layer(CorsLayer::permissive())
-        .layer(Extension(pool))
+        .layer(Extension(pool.clone()))
         .into_inner();
 
-    let routes = Router::new().merge(auth_routes()).layer(layers);
+    let routes = Router::new().merge(auth_routes(&pool)).layer(layers);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
 

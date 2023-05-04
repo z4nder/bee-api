@@ -18,17 +18,3 @@ pub struct UserProfile {
     pub name: String,
     pub email: String,
 }
-
-impl User {
-    pub fn test() -> User {
-        User {
-            id: 1,
-            name: String::from("John Doe"),
-            email: String::from("john.doe@example.com"),
-            password: String::from("password123"),
-            email_verified_at: None,
-            created_at: Some(Utc::now()),
-            updated_at: Some(Utc::now()),
-        }
-    }
-}
