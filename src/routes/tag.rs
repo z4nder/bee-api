@@ -14,7 +14,7 @@ pub fn tag_routes(pool: &MySqlPool) -> Router {
         .route("/tags", get(index))
         .route("/tags/:id", get(find))
         .route("/tags", post(store))
-        .route("/tags", put(update))
-        .route("/tags:id", delete(destroy))
+        .route("/tags/:id", put(update))
+        .route("/tags/:id", delete(destroy))
         .with_state(tag_repository)
 }

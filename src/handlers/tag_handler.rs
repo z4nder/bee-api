@@ -7,7 +7,7 @@ use axum_macros::debug_handler;
 use reqwest::StatusCode;
 
 use crate::{
-    dto::tag_dto::StoreTagPayload,
+    dto::tag_dto::{StoreTagPayload, UpdateTagPayload},
     errors::AppError,
     model::{tag::Tag, user::User},
     repository::tag_repository::{self, TagRepository},
@@ -46,10 +46,27 @@ pub async fn store(
     Ok((StatusCode::CREATED, Json(created_tag_id)))
 }
 
-pub async fn update() {
-    todo!();
+pub async fn update(
+    Path(id): Path<u64>,
+    State(tag_repository): State<TagRepository>,
+    user: User,
+    Json(payload): Json<UpdateTagPayload>,
+) -> Result<impl IntoResponse, AppError> {
+    let updated_id = TagService::update(payload, id, tag_repository, user)
+        .await
+        .map_err(|_| AppError::TagInternalError)?;
+
+    Ok((StatusCode::OK, Json(updated_id)))
 }
 
-pub async fn destroy() {
-    todo!();
+pub async fn destroy(
+    Path(id): Path<u64>,
+    State(tag_repository): State<TagRepository>,
+    user: User,
+) -> Result<impl IntoResponse, AppError> {
+    let deleted_id = TagService::destroy(id, tag_repository, user)
+        .await
+        .map_err(|_| AppError::TagInternalError)?;
+
+    Ok((StatusCode::OK, Json(deleted_id)))
 }

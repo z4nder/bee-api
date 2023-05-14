@@ -1,5 +1,5 @@
 use crate::{
-    dto::tag_dto::StoreTagPayload,
+    dto::tag_dto::{StoreTagPayload, UpdateTagPayload},
     errors::AppError,
     model::{tag::Tag, user::User},
     repository::tag_repository::TagRepository,
@@ -29,19 +29,19 @@ impl TagService {
     }
 
     pub async fn update(
-        payload: StoreTagPayload,
+        payload: UpdateTagPayload,
         id: u64,
         tag_repository: TagRepository,
         user: User,
     ) -> Result<u64, AppError> {
-        todo!();
+        tag_repository.update(id, payload, user).await
     }
 
-    pub async fn delete(
+    pub async fn destroy(
         id: u64,
         tag_repository: TagRepository,
         user: User,
-    ) -> Result<bool, AppError> {
-        todo!();
+    ) -> Result<u64, AppError> {
+        tag_repository.destroy(id, user).await
     }
 }
