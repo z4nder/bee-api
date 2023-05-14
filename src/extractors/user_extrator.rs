@@ -32,7 +32,7 @@ where
             db_connection: pool,
         };
 
-        let claims = jwt::verify(bearer.token());
+        let claims = jwt::verify(bearer.token()).map_err(|err| err.into_response())?;
 
         Ok(user_repository
             .find_user_by_id(&claims.sub)

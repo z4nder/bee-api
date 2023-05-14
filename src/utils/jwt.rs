@@ -34,13 +34,14 @@ pub fn sign(id: u64) -> Result<std::string::String, AppError> {
     .map_err(|_| AppError::TokenError)
 }
 
-pub fn verify(token: &str) -> Claims {
+pub fn verify(token: &str) -> Result<Claims, AppError> {
     let jwt_secret = std::env::var("JWT_SECRET").expect("JWT SECRET ENV NOT SET");
     let decoded_token = jsonwebtoken::decode::<Claims>(
         token,
         &DecodingKey::from_secret(jwt_secret.as_bytes()),
         &Validation::default(),
     )
-    .expect("Crazy error");
-    decoded_token.claims
+    .map_err(|_| AppError::TokenError)?;
+
+    Ok(decoded_token.claims)
 }

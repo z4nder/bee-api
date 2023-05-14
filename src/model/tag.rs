@@ -15,9 +15,3 @@ pub struct Tag {
     pub created_at: Option<DateTime<Utc>>,
     pub updated_at: Option<DateTime<Utc>>,
 }
-
-// impl IntoResponse for Vec<Tag> {
-//     fn into_response(self) -> Response {
-//         (StatusCode::OK, Json(self)).into_response()
-//     }
-// }
