@@ -10,6 +10,7 @@ pub enum AppError {
     DuplicateUserEmail,
     EncryptError,
     TokenError,
+    ResourceNotFound,
 }
 
 impl IntoResponse for AppError {
@@ -23,6 +24,7 @@ impl IntoResponse for AppError {
             Self::WrongCredentials => (StatusCode::BAD_REQUEST, "wrong credentials"),
             Self::EncryptError => (StatusCode::INTERNAL_SERVER_ERROR, "encrypt error"),
             Self::NotFound => (StatusCode::BAD_REQUEST, "missing credential"),
+            Self::ResourceNotFound => (StatusCode::NOT_FOUND, "resource not found"),
             Self::DuplicateUserEmail => (StatusCode::BAD_REQUEST, "email has been exists"),
         };
         (status, Json(json!({ "error": err_msg }))).into_response()

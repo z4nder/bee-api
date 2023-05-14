@@ -24,6 +24,10 @@ impl TagService {
         Ok(created_tag_id)
     }
 
+    pub async fn find(id: u64, tag_repository: TagRepository, user: User) -> Result<Tag, AppError> {
+        tag_repository.find(id, user).await
+    }
+
     pub async fn update(
         payload: StoreTagPayload,
         id: u64,

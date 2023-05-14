@@ -1,4 +1,8 @@
-use axum::{extract::State, response::IntoResponse, Json};
+use axum::{
+    extract::{Path, State},
+    response::IntoResponse,
+    Json,
+};
 use axum_macros::debug_handler;
 use reqwest::StatusCode;
 
@@ -6,7 +10,7 @@ use crate::{
     dto::tag_dto::StoreTagPayload,
     errors::AppError,
     model::{tag::Tag, user::User},
-    repository::tag_repository::TagRepository,
+    repository::tag_repository::{self, TagRepository},
     services::tag_services::TagService,
 };
 
@@ -20,8 +24,14 @@ pub async fn index(
     Ok(Json(tags))
 }
 
-pub async fn find() {
-    todo!();
+pub async fn find(
+    Path(id): Path<u64>,
+    State(tag_repository): State<TagRepository>,
+    user: User,
+) -> Result<Json<Tag>, AppError> {
+    let tag = TagService::find(id, tag_repository, user).await?;
+
+    Ok(Json(tag))
 }
 
 pub async fn store(
@@ -40,6 +50,6 @@ pub async fn update() {
     todo!();
 }
 
-pub async fn delete() {
+pub async fn destroy() {
     todo!();
 }

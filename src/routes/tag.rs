@@ -2,7 +2,7 @@ use axum::routing::{delete, post, put};
 use axum::{routing::get, Router};
 use sqlx::MySqlPool;
 
-use crate::handlers::tag_handler::{index, store};
+use crate::handlers::tag_handler::{destroy, find, index, store, update};
 use crate::repository::tag_repository::TagRepository;
 
 pub fn tag_routes(pool: &MySqlPool) -> Router {
@@ -12,9 +12,9 @@ pub fn tag_routes(pool: &MySqlPool) -> Router {
 
     Router::new()
         .route("/tags", get(index))
-        // .route("/tags:id", get(register))
+        .route("/tags/:id", get(find))
         .route("/tags", post(store))
-        // .route("/tags", put(authorize))
-        // .route("/tags:id", delete(authorize))
+        .route("/tags", put(update))
+        .route("/tags:id", delete(destroy))
         .with_state(tag_repository)
 }

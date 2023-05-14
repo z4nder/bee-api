@@ -22,6 +22,23 @@ impl TagRepository {
         }
     }
 
+    pub async fn find(&self, id: u64, owner: User) -> Result<Tag, AppError> {
+        let query = sqlx::query_as!(
+            Tag,
+            r#"SELECT * FROM tags WHERE created_by = ? AND id = ?"#,
+            owner.id,
+            id
+        )
+        .fetch_one(&self.db_connection)
+        .await;
+
+        if let Ok(tag) = query {
+            Ok(tag)
+        } else {
+            Err(AppError::ResourceNotFound)
+        }
+    }
+
     pub async fn store(&self, payload: StoreTagPayload, owner: User) -> Result<u64, AppError> {
         let insert_id = sqlx::query_as!(
             Tag,
