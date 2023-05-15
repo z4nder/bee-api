@@ -16,7 +16,7 @@ mod services;
 mod utils;
 
 use database::mysql::db_connect;
-use routes::auth::auth_routes;
+use routes::{auth::auth_routes, spend::spend_routes};
 
 use crate::routes::tag::tag_routes;
 
@@ -25,7 +25,6 @@ async fn main() {
     dotenv().ok();
 
     let pool = db_connect().await.unwrap();
-    // let pool_layer = db_connect().await.unwrap();
 
     let layers = ServiceBuilder::new()
         .layer(TraceLayer::new_for_http())
@@ -36,6 +35,7 @@ async fn main() {
     let routes = Router::new()
         .merge(auth_routes(&pool))
         .merge(tag_routes(&pool))
+        .merge(spend_routes(&pool))
         .layer(layers);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));

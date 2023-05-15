@@ -1,8 +1,5 @@
-use chrono::{DateTime, Utc};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use validator::Validate;
-
-use crate::model::user::User;
 
 #[derive(Debug, Deserialize, Validate)]
 pub struct StoreTagPayload {
