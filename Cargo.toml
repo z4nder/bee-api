@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 axum = { version = "0.6.1", features = ["headers"] }
 tokio = { version = "1.0", features = ["full"] }
-sqlx = { version = "0.6", features = [ "runtime-tokio-rustls", "mysql", "chrono"] }
+sqlx = { version = "0.6", features = [ "runtime-tokio-rustls", "mysql", "chrono", "bigdecimal"] }
 serde = { version = "1", features = ["derive"] }
 dotenv = "0.15.0"
 async-trait = "0.1.60"
@@ -25,3 +25,4 @@ axum-macros = "0.3.7"
 bcrypt = "0.14.0"
 rayon = "1.7.0"
 thiserror = "1.0.40"
+bigdecimal = {version = "0.3.1", features = ["serde"]}

@@ -12,7 +12,9 @@ impl SpendService {
         spend_repository: SpendRepository,
         user: User,
     ) -> Result<Vec<Spend>, AppError> {
-        todo!();
+        let spends = spend_repository.index(user).await?;
+
+        Ok(spends)
     }
 
     pub async fn store(

@@ -4,6 +4,7 @@ use serde_json::json;
 
 #[derive(Debug)]
 pub enum AppError {
+    SpendInternalError,
     TagInternalError,
     NotFound,
     WrongCredentials,
@@ -16,6 +17,10 @@ pub enum AppError {
 impl IntoResponse for AppError {
     fn into_response(self) -> axum::response::Response {
         let (status, err_msg) = match self {
+            Self::SpendInternalError => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "spend service internal error",
+            ),
             Self::TagInternalError => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "tag service internal error",

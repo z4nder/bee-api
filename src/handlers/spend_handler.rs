@@ -9,14 +9,16 @@ use crate::{
     errors::AppError,
     model::{spend::Spend, user::User},
     repository::spend_repository::SpendRepository,
+    services::spend_service::SpendService,
 };
 
-#[debug_handler]
 pub async fn index(
     State(spend_repository): State<SpendRepository>,
     user: User,
 ) -> Result<Json<Vec<Spend>>, AppError> {
-    todo!();
+    let spends = SpendService::index(spend_repository, user).await?;
+
+    Ok(Json(spends))
 }
 
 pub async fn find(

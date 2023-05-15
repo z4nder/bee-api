@@ -11,7 +11,19 @@ pub struct SpendRepository {
 
 impl SpendRepository {
     pub async fn index(&self, owner: User) -> Result<Vec<Spend>, AppError> {
-        todo!();
+        let query = sqlx::query_as!(
+            Spend,
+            r#"SELECT * FROM spends WHERE created_by = ?"#,
+            owner.id
+        )
+        .fetch_all(&self.db_connection)
+        .await;
+
+        if let Ok(spends) = query {
+            Ok(spends)
+        } else {
+            Err(AppError::SpendInternalError)
+        }
     }
 
     pub async fn find(&self, id: u64, owner: User) -> Result<Spend, AppError> {

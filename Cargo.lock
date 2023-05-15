@@ -193,6 +193,7 @@ dependencies = [
  "axum",
  "axum-macros",
  "bcrypt",
+ "bigdecimal",
  "chrono",
  "dotenv",
  "futures-util",
@@ -208,6 +209,18 @@ dependencies = [
  "tower-http",
  "uuid",
  "validator",
+]
+
+[[package]]
+name = "bigdecimal"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a6773ddc0eafc0e509fb60e48dff7f450f8e674a0686ae8605e8d9901bd5eefa"
+dependencies = [
+ "num-bigint",
+ "num-integer",
+ "num-traits",
+ "serde",
 ]
 
 [[package]]
@@ -1899,6 +1912,7 @@ checksum = "fa8241483a83a3f33aa5fff7e7d9def398ff9990b2752b6c6112b83c6d246029"
 dependencies = [
  "ahash",
  "atoi",
+ "bigdecimal",
  "bitflags",
  "byteorder",
  "bytes",
