@@ -2,7 +2,7 @@ use chrono::Utc;
 
 use crate::{
     dto::auth_dto::{CreateUserData, LoginInput, RegisterInput},
-    errors::AppError,
+    errors::{ApiError, AppError},
     model::user::User,
     repository::user_repository::UserRepository,
     utils::encryption,
@@ -14,26 +14,26 @@ impl<'a> AuthService {
     pub async fn login(
         input: LoginInput,
         user_repository: UserRepository,
-    ) -> Result<User, AppError> {
+    ) -> Result<User, ApiError> {
         let user = user_repository.find_user_by_email(&input.email).await?;
 
         if encryption::verify_password(input.password, user.password.to_owned()).await? {
             Ok(user)
         } else {
-            Err(AppError::WrongCredentials)
+            Err(ApiError::new(AppError::WrongCredentials, None))
         }
     }
 
     pub async fn register(
         input: RegisterInput,
         user_repository: UserRepository,
-    ) -> Result<u64, AppError> {
+    ) -> Result<u64, ApiError> {
         if user_repository
             .find_user_by_email(&input.email)
             .await
             .is_ok()
         {
-            return Err(AppError::DuplicateUserEmail);
+            return Err(ApiError::new(AppError::DuplicateUserEmail, None));
         }
 
         let data = CreateUserData {

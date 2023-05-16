@@ -1,6 +1,7 @@
 use sqlx::MySqlPool;
 
 use crate::dto::spend_dto::{StoreSpendPayload, UpdateSpendPayload};
+use crate::errors::ApiError;
 use crate::model::spend::Spend;
 use crate::{errors::AppError, model::user::User};
 
@@ -10,7 +11,7 @@ pub struct SpendRepository {
 }
 
 impl SpendRepository {
-    pub async fn index(&self, owner: User) -> Result<Vec<Spend>, AppError> {
+    pub async fn index(&self, owner: User) -> Result<Vec<Spend>, ApiError> {
         let query = sqlx::query_as!(
             Spend,
             r#"SELECT * FROM spends WHERE created_by = ?"#,
@@ -22,15 +23,15 @@ impl SpendRepository {
         if let Ok(spends) = query {
             Ok(spends)
         } else {
-            Err(AppError::SpendInternalError)
+            Err(ApiError::new(AppError::SpendInternalError, None))
         }
     }
 
-    pub async fn find(&self, id: u64, owner: User) -> Result<Spend, AppError> {
+    pub async fn find(&self, id: u64, owner: User) -> Result<Spend, ApiError> {
         todo!();
     }
 
-    pub async fn store(&self, payload: StoreSpendPayload, owner: User) -> Result<u64, AppError> {
+    pub async fn store(&self, payload: StoreSpendPayload, owner: User) -> Result<u64, ApiError> {
         let insert_id = sqlx::query_as!(
             Spend,
             r#"INSERT INTO spends (name, date, value, created_by) VALUES (?, ?, ?, ?)"#,
@@ -41,10 +42,7 @@ impl SpendRepository {
         )
         .execute(&self.db_connection)
         .await
-        .map_err(|error| {
-            println!("{:?}", error);
-            AppError::SpendInternalError
-        })?
+        .map_err(|error| ApiError::new(AppError::SpendInternalError, Some(error.to_string())))?
         .last_insert_id();
 
         for tag_id in payload.tags {
@@ -56,10 +54,7 @@ impl SpendRepository {
             )
             .execute(&self.db_connection)
             .await
-            .map_err(|error| {
-                println!("{:?}", error);
-                AppError::SpendInternalError
-            })?
+            .map_err(|error| ApiError::new(AppError::SpendInternalError, Some(error.to_string())))?
             .last_insert_id();
         }
 
@@ -71,11 +66,11 @@ impl SpendRepository {
         id: u64,
         payload: UpdateSpendPayload,
         owner: User,
-    ) -> Result<u64, AppError> {
+    ) -> Result<u64, ApiError> {
         todo!();
     }
 
-    pub async fn destroy(&self, id: u64, owner: User) -> Result<u64, AppError> {
+    pub async fn destroy(&self, id: u64, owner: User) -> Result<u64, ApiError> {
         todo!();
     }
 }

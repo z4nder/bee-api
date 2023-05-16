@@ -3,7 +3,7 @@ use axum_macros::debug_handler;
 
 use crate::{
     dto::auth_dto::{LoginInput, RegisterInput, TokenPayload},
-    errors::AppError,
+    errors::ApiError,
     model::user::{User, UserProfile},
     repository::user_repository::UserRepository,
     services::auth_service::AuthService,
@@ -22,10 +22,8 @@ pub async fn authorize(user: User) -> Json<UserProfile> {
 pub async fn login(
     State(user_repository): State<UserRepository>,
     Json(payload): Json<LoginInput>,
-) -> Result<Json<TokenPayload>, AppError> {
-    let user = AuthService::login(payload, user_repository)
-        .await
-        .map_err(|_| AppError::WrongCredentials)?;
+) -> Result<Json<TokenPayload>, ApiError> {
+    let user = AuthService::login(payload, user_repository).await?;
 
     let token = jwt::sign(user.id)?;
 
@@ -38,7 +36,7 @@ pub async fn login(
 pub async fn register(
     State(user_repository): State<UserRepository>,
     Json(payload): Json<RegisterInput>,
-) -> Result<Json<TokenPayload>, AppError> {
+) -> Result<Json<TokenPayload>, ApiError> {
     let id = AuthService::register(payload, user_repository).await?;
 
     let token = jwt::sign(id)?;

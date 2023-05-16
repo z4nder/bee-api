@@ -14,23 +14,39 @@ pub enum AppError {
     ResourceNotFound,
 }
 
-impl IntoResponse for AppError {
+pub struct ApiError {
+    error: AppError,
+    message: Option<String>,
+}
+
+impl ApiError {
+    pub fn new(error: AppError, message: Option<String>) -> ApiError {
+        ApiError { error, message }
+    }
+}
+impl IntoResponse for ApiError {
     fn into_response(self) -> axum::response::Response {
-        let (status, err_msg) = match self {
-            Self::SpendInternalError => (
+        match self.message {
+            Some(message) => {
+                println!("{:?}", message)
+            }
+            None => println!("Empty message api error"),
+        };
+        let (status, err_msg) = match self.error {
+            AppError::SpendInternalError => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "spend service internal error",
             ),
-            Self::TagInternalError => (
+            AppError::TagInternalError => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 "tag service internal error",
             ),
-            Self::TokenError => (StatusCode::INTERNAL_SERVER_ERROR, "token error"),
-            Self::WrongCredentials => (StatusCode::BAD_REQUEST, "wrong credentials"),
-            Self::EncryptError => (StatusCode::INTERNAL_SERVER_ERROR, "encrypt error"),
-            Self::NotFound => (StatusCode::BAD_REQUEST, "missing credential"),
-            Self::ResourceNotFound => (StatusCode::NOT_FOUND, "resource not found"),
-            Self::DuplicateUserEmail => (StatusCode::BAD_REQUEST, "email has been exists"),
+            AppError::TokenError => (StatusCode::INTERNAL_SERVER_ERROR, "token error"),
+            AppError::WrongCredentials => (StatusCode::BAD_REQUEST, "wrong credentials"),
+            AppError::EncryptError => (StatusCode::INTERNAL_SERVER_ERROR, "encrypt error"),
+            AppError::NotFound => (StatusCode::BAD_REQUEST, "missing credential"),
+            AppError::ResourceNotFound => (StatusCode::NOT_FOUND, "resource not found"),
+            AppError::DuplicateUserEmail => (StatusCode::BAD_REQUEST, "email has been exists"),
         };
         (status, Json(json!({ "error": err_msg }))).into_response()
     }

@@ -1,6 +1,6 @@
 use crate::{
     dto::spend_dto::{StoreSpendPayload, UpdateSpendPayload},
-    errors::AppError,
+    errors::{ApiError, AppError},
     model::{spend::Spend, user::User},
     repository::spend_repository::SpendRepository,
 };
@@ -11,7 +11,7 @@ impl SpendService {
     pub async fn index(
         spend_repository: SpendRepository,
         user: User,
-    ) -> Result<Vec<Spend>, AppError> {
+    ) -> Result<Vec<Spend>, ApiError> {
         let spends = spend_repository.index(user).await?;
 
         Ok(spends)
@@ -21,7 +21,7 @@ impl SpendService {
         payload: StoreSpendPayload,
         spend_repository: SpendRepository,
         user: User,
-    ) -> Result<u64, AppError> {
+    ) -> Result<u64, ApiError> {
         let id = spend_repository.store(payload, user).await?;
 
         Ok(id)
@@ -31,7 +31,7 @@ impl SpendService {
         id: u64,
         spend_repository: SpendRepository,
         user: User,
-    ) -> Result<Spend, AppError> {
+    ) -> Result<Spend, ApiError> {
         todo!();
     }
 
@@ -40,7 +40,7 @@ impl SpendService {
         id: u64,
         spend_repository: SpendRepository,
         user: User,
-    ) -> Result<u64, AppError> {
+    ) -> Result<u64, ApiError> {
         todo!();
     }
 
@@ -48,7 +48,7 @@ impl SpendService {
         id: u64,
         spend_repository: SpendRepository,
         user: User,
-    ) -> Result<u64, AppError> {
+    ) -> Result<u64, ApiError> {
         todo!();
     }
 }
