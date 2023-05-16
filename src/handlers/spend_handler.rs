@@ -33,8 +33,10 @@ pub async fn store(
     State(spend_repository): State<SpendRepository>,
     user: User,
     Json(payload): Json<StoreSpendPayload>,
-) {
-    todo!();
+) -> Result<Json<u64>, AppError> {
+    let id = SpendService::store(payload, spend_repository, user).await?;
+
+    Ok(Json(id))
 }
 
 pub async fn update(

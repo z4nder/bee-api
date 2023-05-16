@@ -22,7 +22,9 @@ impl SpendService {
         spend_repository: SpendRepository,
         user: User,
     ) -> Result<u64, AppError> {
-        todo!();
+        let id = spend_repository.store(payload, user).await?;
+
+        Ok(id)
     }
 
     pub async fn find(

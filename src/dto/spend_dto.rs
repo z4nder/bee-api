@@ -9,8 +9,7 @@ pub struct StoreSpendPayload {
     pub date: String,
     #[validate(range(min = 0.1))]
     pub value: f64,
-    #[validate]
-    pub tags: Vec<SelectedTags>,
+    pub tags: Vec<u64>,
 }
 
 #[derive(Debug, Deserialize, Validate)]
@@ -21,12 +20,6 @@ pub struct UpdateSpendPayload {
     pub date: String,
     #[validate(range(min = 0.1))]
     pub value: f64,
-    #[validate]
-    pub tags: Vec<SelectedTags>,
-}
 
-#[derive(Debug, Validate, Deserialize)]
-pub struct SelectedTags {
-    #[validate(range(min = 1))]
-    name: u64,
+    pub tags: Vec<u64>,
 }

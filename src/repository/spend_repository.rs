@@ -31,7 +31,23 @@ impl SpendRepository {
     }
 
     pub async fn store(&self, payload: StoreSpendPayload, owner: User) -> Result<u64, AppError> {
-        todo!();
+        let insert_id = sqlx::query_as!(
+            Spend,
+            r#"INSERT INTO spends (name, date, value, created_by) VALUES (?, ?, ?, ?)"#,
+            payload.name,
+            payload.date,
+            payload.value,
+            owner.id
+        )
+        .execute(&self.db_connection)
+        .await
+        .map_err(|message| {
+            println!("{:?}", message);
+            AppError::SpendInternalError
+        })?
+        .last_insert_id();
+
+        Ok(insert_id)
     }
 
     pub async fn update(
