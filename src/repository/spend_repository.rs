@@ -41,8 +41,27 @@ impl SpendRepository {
         )
         .execute(&self.db_connection)
         .await
-        .map_err(|_| AppError::SpendInternalError)?
+        .map_err(|error| {
+            println!("{:?}", error);
+            AppError::SpendInternalError
+        })?
         .last_insert_id();
+
+        for tag_id in payload.tags {
+            sqlx::query_as!(
+                Spend,
+                r#"INSERT INTO spends_tags (spend_id, tag_id) VALUES (?, ?)"#,
+                insert_id,
+                tag_id
+            )
+            .execute(&self.db_connection)
+            .await
+            .map_err(|error| {
+                println!("{:?}", error);
+                AppError::SpendInternalError
+            })?
+            .last_insert_id();
+        }
 
         Ok(insert_id)
     }
