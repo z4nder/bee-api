@@ -41,10 +41,7 @@ impl SpendRepository {
         )
         .execute(&self.db_connection)
         .await
-        .map_err(|message| {
-            println!("{:?}", message);
-            AppError::SpendInternalError
-        })?
+        .map_err(|_| AppError::SpendInternalError)?
         .last_insert_id();
 
         Ok(insert_id)
